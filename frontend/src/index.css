@@ -1,1 +1,18 @@
 @import "tailwindcss";
+
+/* small UX polish: smooth color transitions site-wide */
+html,
+body,
+#root {
+  height: 100%;
+  transition: background-color 180ms ease, color 180ms ease;
+}
+
+/* container helper (optional) */
+.container {
+  max-width: 1100px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}

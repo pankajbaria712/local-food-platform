@@ -1,129 +1,151 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { Menu, X, Sun, Moon } from "lucide-react";
+import React, { useState, useContext, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { ThemeContext } from "../context/ThemeContext";
+import { Sun, Moon, Monitor, Menu, X } from "lucide-react";
 
 export default function Navbar() {
-  const [darkMode, setDarkMode] = useState(false);
+  const navigate = useNavigate();
+  const { theme, toggleTheme, isDark } = useContext(ThemeContext);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
 
-  const user = JSON.parse(localStorage.getItem("user"));
-  const token = localStorage.getItem("token");
-
-  const toggleTheme = () => {
-    setDarkMode(!darkMode);
-    document.documentElement.classList.toggle("dark");
-  };
+  // Load user/token once
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    const storedToken = localStorage.getItem("token");
+    setUser(storedUser ? JSON.parse(storedUser) : null);
+    setToken(storedToken);
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("user");
     localStorage.removeItem("token");
-    window.location.href = "/";
+    setUser(null);
+    setToken(null);
+    navigate("/");
+    setMenuOpen(false);
+  };
+
+  const baseLinks = [
+    { to: "/", label: "Home" },
+    { to: "/about", label: "About" },
+    { to: "/contact", label: "Contact" },
+  ];
+
+  const authLinks = !token
+    ? [
+        { to: "/login", label: "Login" },
+        { to: "/register", label: "Register", special: true },
+      ]
+    : user?.role === "donor"
+    ? [
+        { to: "/donate", label: "Donate Food" },
+        { to: "/myposts", label: "My Posts" },
+        { label: "Logout", action: handleLogout, danger: true },
+      ]
+    : [
+        { to: "/browse", label: "Browse Food" },
+        { to: "/claimed", label: "Claimed Food" },
+        { label: "Logout", action: handleLogout, danger: true },
+      ];
+
+  // Theme icon
+  const themeIcon =
+    theme === "system" ? (
+      <Monitor size={18} />
+    ) : theme === "dark" ? (
+      <Sun size={18} />
+    ) : (
+      <Moon size={18} />
+    );
+
+  // Helper: get navbar classes depending on theme & isDark
+  const navbarClasses = () => {
+    if (theme === "light") return "bg-white text-gray-700 border-gray-100";
+    if (theme === "dark") return "bg-gray-950 text-gray-100 border-gray-800"; // darker than system
+    // system mode
+    return isDark
+      ? "bg-gray-900 text-gray-300 border-gray-800" // system dark
+      : "bg-white text-gray-700 border-gray-100"; // system light
+  };
+  const hoverTextClass = (special = false) => {
+    if (special) return "";
+    if (theme === "light") return "hover:text-green-600";
+    if (theme === "dark") return "dark:hover:text-green-400";
+    return isDark ? "dark:hover:text-green-400" : "hover:text-green-600";
+  };
+
+  const buttonBgClass = () => {
+    if (theme === "light") return "bg-gray-200";
+    if (theme === "dark") return "bg-gray-700";
+    return isDark ? "bg-black-700" : "bg-gray-200";
+  };
+
+  const handleLinkClick = (action) => {
+    if (action) action();
+    setMenuOpen(false);
   };
 
   return (
-    <nav className="sticky top-0 z-50 backdrop-blur-md bg-white/80 dark:bg-gray-900/70 shadow-md border-b border-gray-100 dark:border-gray-800 transition-colors duration-300">
+    <nav
+      className={`sticky top-0 z-50 backdrop-blur-md shadow-md border-b transition-colors duration-300 ${navbarClasses()}`}
+    >
       <div className="container mx-auto flex items-center justify-between px-6 py-3">
         {/* Logo */}
         <Link
           to="/"
           className="text-3xl font-extrabold bg-gradient-to-r from-green-500 to-lime-400 bg-clip-text text-transparent hover:scale-105 transition-transform duration-200"
+          onClick={() => setMenuOpen(false)}
         >
           FoodShare
         </Link>
 
         {/* Desktop Menu */}
-        <div className="hidden md:flex space-x-6 items-center text-gray-700 dark:text-gray-300 font-medium">
-          {[
-            { to: "/", label: "Home" },
-            { to: "/about", label: "About" },
-            { to: "/contact", label: "Contact" },
-          ].map((link) => (
-            <Link
-              key={link.to}
-              to={link.to}
-              className="relative hover:text-green-600 dark:hover:text-green-400 after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-[2px] after:bg-green-500 after:transition-all after:duration-300 hover:after:w-full"
-            >
-              {link.label}
-            </Link>
-          ))}
-
-          {/* Auth / Role-based Links */}
-          {!token && (
-            <>
-              <Link
-                to="/login"
-                className="hover:text-green-600 dark:hover:text-green-400"
-              >
-                Login
-              </Link>
-              <Link
-                to="/register"
-                className="px-4 py-2 rounded-full bg-green-500 text-white hover:bg-green-600 transition-colors"
-              >
-                Register
-              </Link>
-            </>
-          )}
-
-          {token && user?.role === "donor" && (
-            <>
-              <Link
-                to="/donate"
-                className="hover:text-green-600 dark:hover:text-green-400"
-              >
-                Donate Food
-              </Link>
-              <Link
-                to="/myposts"
-                className="hover:text-green-600 dark:hover:text-green-400"
-              >
-                My Posts
-              </Link>
+        <div className="hidden md:flex items-center space-x-6 font-medium">
+          {[...baseLinks, ...authLinks].map((link, idx) =>
+            link.action ? (
               <button
-                onClick={handleLogout}
-                className="text-red-500 hover:text-red-600"
+                key={idx}
+                onClick={link.action}
+                className={`transition-colors ${
+                  link.danger
+                    ? "text-red-500 hover:text-red-600"
+                    : hoverTextClass()
+                }`}
               >
-                Logout
+                {link.label}
               </button>
-            </>
-          )}
-
-          {token && user?.role === "receiver" && (
-            <>
+            ) : (
               <Link
-                to="/browse"
-                className="hover:text-green-600 dark:hover:text-green-400"
+                key={link.to}
+                to={link.to}
+                className={`relative transition-colors ${
+                  link.special
+                    ? "px-4 py-2 rounded-full bg-green-500 text-white hover:bg-green-600"
+                    : hoverTextClass()
+                } after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-[2px] after:bg-green-500 after:transition-all after:duration-300 hover:after:w-full`}
               >
-                Browse Food
+                {link.label}
               </Link>
-              <Link
-                to="/claimed"
-                className="hover:text-green-600 dark:hover:text-green-400"
-              >
-                Claimed Food
-              </Link>
-              <button
-                onClick={handleLogout}
-                className="text-red-500 hover:text-red-600"
-              >
-                Logout
-              </button>
-            </>
+            )
           )}
 
           {/* Theme Toggle */}
           <button
             onClick={toggleTheme}
-            className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:scale-110 transition-transform"
+            aria-label="Toggle theme"
+            className={`p-2 rounded-full ${buttonBgClass()} hover:scale-110 transition-transform`}
           >
-            {darkMode ? <Sun size={18} /> : <Moon size={18} />}
+            {themeIcon}
           </button>
         </div>
 
         {/* Mobile Menu Button */}
         <button
-          className="md:hidden text-gray-700 dark:text-gray-300"
-          onClick={() => setMenuOpen(!menuOpen)}
+          aria-label="Toggle menu"
+          className={`${isDark ? "text-gray-300" : "text-gray-700"} md:hidden`}
+          onClick={() => setMenuOpen((prev) => !prev)}
         >
           {menuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
@@ -131,70 +153,48 @@ export default function Navbar() {
 
       {/* Mobile Dropdown */}
       {menuOpen && (
-        <div className="md:hidden bg-white/95 dark:bg-gray-900/95 border-t border-gray-200 dark:border-gray-800 px-6 py-4 space-y-3 text-gray-700 dark:text-gray-300 animate-slideDown">
-          <Link to="/" className="block hover:text-green-500">
-            Home
-          </Link>
-          <Link to="/about" className="block hover:text-green-500">
-            About
-          </Link>
-          <Link to="/contact" className="block hover:text-green-500">
-            Contact
-          </Link>
-
-          {!token && (
-            <>
-              <Link to="/login" className="block hover:text-green-500">
-                Login
-              </Link>
+        <div
+          className={`md:hidden px-6 py-4 space-y-3 border-t transition-colors duration-300 ${
+            isDark
+              ? "bg-gray-900 border-gray-800 text-gray-300"
+              : "bg-white border-gray-200 text-gray-700"
+          }`}
+        >
+          {[...baseLinks, ...authLinks].map((link, idx) =>
+            link.action ? (
+              <button
+                key={idx}
+                onClick={() => handleLinkClick(link.action)}
+                className={`block w-full text-left transition-colors ${
+                  link.danger
+                    ? "text-red-500 hover:text-red-600"
+                    : hoverTextClass()
+                }`}
+              >
+                {link.label}
+              </button>
+            ) : (
               <Link
-                to="/register"
-                className="block px-4 py-2 rounded-full bg-green-500 text-white hover:bg-green-600 text-center"
+                key={link.to}
+                to={link.to}
+                onClick={() => handleLinkClick()}
+                className={`block text-center transition-colors ${
+                  link.special
+                    ? "px-4 py-2 rounded-full bg-green-500 text-white hover:bg-green-600"
+                    : hoverTextClass()
+                }`}
               >
-                Register
+                {link.label}
               </Link>
-            </>
+            )
           )}
 
-          {token && user?.role === "donor" && (
-            <>
-              <Link to="/donate" className="block hover:text-green-500">
-                Donate Food
-              </Link>
-              <Link to="/myposts" className="block hover:text-green-500">
-                My Posts
-              </Link>
-              <button
-                onClick={handleLogout}
-                className="block text-red-500 hover:text-red-600"
-              >
-                Logout
-              </button>
-            </>
-          )}
-
-          {token && user?.role === "receiver" && (
-            <>
-              <Link to="/browse" className="block hover:text-green-500">
-                Browse Food
-              </Link>
-              <Link to="/claimed" className="block hover:text-green-500">
-                Claimed Food
-              </Link>
-              <button
-                onClick={handleLogout}
-                className="block text-red-500 hover:text-red-600"
-              >
-                Logout
-              </button>
-            </>
-          )}
-
+          {/* Theme toggle for mobile */}
           <button
             onClick={toggleTheme}
-            className="mt-3 p-2 rounded-full bg-gray-200 dark:bg-gray-700 w-full flex justify-center"
+            className={`mt-3 p-2 rounded-full w-full flex justify-center ${buttonBgClass()} hover:scale-105 transition-transform`}
           >
-            {darkMode ? <Sun size={18} /> : <Moon size={18} />}
+            {themeIcon}
           </button>
         </div>
       )}
