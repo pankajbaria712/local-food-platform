@@ -1,37 +1,37 @@
-const express = require("express");
+import express from "express";
+import Post from "../models/Post.js";
+import { authMiddleware } from "../middleware/auth.js";
+
 const router = express.Router();
-const Post = require("../models/Post");
-const auth = require("../middleware/auth");
 
 // Create post
-router.post("/", auth, async (req, res) => {
+router.post("/create", authMiddleware, async (req, res) => {
   try {
-    const post = await Post.create({ ...req.body, user: req.user._id });
-    res.json(post);
-  } catch (e) {
-    res.status(500).json({ message: "Server error" });
+    const { title, description, quantity, type, pickupAt, location } = req.body;
+
+    if (!title || !quantity || !pickupAt || !location) {
+      return res
+        .status(400)
+        .json({ message: "All required fields must be provided" });
+    }
+
+    const newPost = await Post.create({
+      title,
+      description,
+      quantity,
+      type,
+      pickupAt,
+      location,
+      user: req.user.id,
+    });
+
+    res
+      .status(201)
+      .json({ message: "Post created successfully!", post: newPost });
+  } catch (err) {
+    console.error("Error creating post:", err.message);
+    res.status(500).json({ message: "Server error while creating post" });
   }
 });
 
-// Get all posts
-router.get("/", async (req, res) => {
-  const posts = await Post.find().sort("-createdAt");
-  res.json(posts);
-});
-
-// Get my posts
-router.get("/mine", auth, async (req, res) => {
-  const posts = await Post.find({ user: req.user._id }).sort("-createdAt");
-  res.json(posts);
-});
-
-// Claim post
-router.post("/:id/claim", auth, async (req, res) => {
-  const post = await Post.findById(req.params.id);
-  if (!post) return res.status(404).json({ message: "Not found" });
-  post.claimedBy = req.user._id;
-  await post.save();
-  res.json({ message: "Claimed" });
-});
-
-module.exports = router;
+export default router;

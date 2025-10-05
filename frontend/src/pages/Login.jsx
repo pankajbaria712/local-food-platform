@@ -1,18 +1,24 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import { ThemeContext } from "../context/ThemeContext";
+import { Loader2 } from "lucide-react";
 
 export default function Login() {
   const navigate = useNavigate();
+  const { theme, isDark } = useContext(ThemeContext);
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleChange = (e) => {
+  const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError("");
+
     try {
       const res = await axios.post(
         "http://localhost:5000/api/auth/login",
@@ -20,30 +26,54 @@ export default function Login() {
       );
       localStorage.setItem("user", JSON.stringify(res.data.user));
       localStorage.setItem("token", res.data.token);
-      navigate("/"); // go to home
-      window.location.reload(); // refresh navbar
+      navigate("/");
+      window.location.reload();
     } catch (err) {
-      setError(err.response?.data?.message || "Login failed");
+      setError(err.response?.data?.message || "Login failed. Try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
+  // Theme-based colors
+  const bgClass =
+    theme === "dark"
+      ? "bg-gray-950 text-gray-100"
+      : theme === "light"
+      ? "bg-gray-100 text-gray-900"
+      : isDark
+      ? "bg-gray-900 text-gray-100"
+      : "bg-gray-100 text-gray-900";
+
+  const cardClass =
+    theme === "dark" || (theme === "system" && isDark)
+      ? "bg-gray-900 border-gray-800"
+      : "bg-white border-gray-200";
+
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100 dark:bg-gray-800">
-      <div className="w-full max-w-md bg-white dark:bg-gray-900 p-6 rounded-lg shadow-lg">
-        <h2 className="text-2xl font-bold text-center mb-6 text-green-600 dark:text-green-400">
+    <div
+      className={`flex justify-center items-center min-h-screen ${bgClass} transition-colors duration-500`}
+    >
+      <div
+        className={`w-full max-w-md border rounded-2xl shadow-lg p-8 ${cardClass} transition-all duration-500`}
+      >
+        <h2 className="text-3xl font-bold text-center mb-6 bg-gradient-to-r from-green-500 to-lime-400 bg-clip-text text-transparent">
           Login
         </h2>
-        {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+
+        {error && (
+          <p className="text-red-500 text-sm mb-4 text-center">{error}</p>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
             type="email"
             name="email"
-            placeholder="Email"
+            placeholder="Email address"
             value={form.email}
             onChange={handleChange}
             required
-            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-800 dark:border-gray-700"
+            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 bg-transparent"
           />
 
           <input
@@ -53,25 +83,26 @@ export default function Login() {
             value={form.password}
             onChange={handleChange}
             required
-            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-800 dark:border-gray-700"
+            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 bg-transparent"
           />
 
           <button
             type="submit"
-            className="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition"
+            disabled={loading}
+            className="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition flex items-center justify-center"
           >
-            Login
+            {loading ? <Loader2 className="animate-spin" size={20} /> : "Login"}
           </button>
         </form>
 
-        <p className="text-sm text-center mt-4">
+        <p className="text-sm text-center mt-6">
           Don’t have an account?{" "}
-          <a
-            href="/register"
-            className="text-green-600 dark:text-green-400 hover:underline"
+          <Link
+            to="/register"
+            className="text-green-600 dark:text-green-400 hover:underline font-medium"
           >
             Register
-          </a>
+          </Link>
         </p>
       </div>
     </div>

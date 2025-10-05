@@ -1,17 +1,18 @@
 import React, { useState, useContext } from "react";
 import axios from "axios";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { ThemeContext } from "../context/ThemeContext";
 import { Loader2 } from "lucide-react";
 
-export default function Register() {
+export default function DonateFood() {
   const navigate = useNavigate();
   const { theme, isDark } = useContext(ThemeContext);
   const [form, setForm] = useState({
-    name: "",
-    email: "",
-    password: "",
-    role: "donor",
+    foodName: "",
+    description: "",
+    quantity: "",
+    pickupTime: "",
+    location: "",
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -25,24 +26,21 @@ export default function Register() {
     setError("");
 
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/auth/register",
-        form
-      );
-      localStorage.setItem("user", JSON.stringify(res.data.user));
-      localStorage.setItem("token", res.data.token);
-      navigate("/");
-      window.location.reload();
+      const token = localStorage.getItem("token");
+
+      await axios.post("http://localhost:5000/api/food/donate", form, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      navigate("/my-posts");
     } catch (err) {
-      setError(
-        err.response?.data?.message || "Registration failed. Try again."
-      );
+      setError(err.response?.data?.message || "Something went wrong.");
     } finally {
       setLoading(false);
     }
   };
 
-  // Theme-based background and card styles
+  // Theme-based colors
   const bgClass =
     theme === "dark"
       ? "bg-gray-950 text-gray-100"
@@ -62,10 +60,10 @@ export default function Register() {
       className={`flex justify-center items-center min-h-screen ${bgClass} transition-colors duration-500`}
     >
       <div
-        className={`w-full max-w-md border rounded-2xl shadow-lg p-8 ${cardClass} transition-all duration-500 animate-fadeIn`}
+        className={`w-full max-w-lg border rounded-2xl shadow-lg p-8 ${cardClass} transition-all duration-500`}
       >
         <h2 className="text-3xl font-bold text-center mb-6 bg-gradient-to-r from-green-500 to-lime-400 bg-clip-text text-transparent">
-          Create Account
+          Donate Food
         </h2>
 
         {error && (
@@ -75,43 +73,52 @@ export default function Register() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
             type="text"
-            name="name"
-            placeholder="Full Name"
-            value={form.name}
+            name="foodName"
+            placeholder="Food title (e.g., Rice, Sandwiches)"
+            value={form.foodName}
             onChange={handleChange}
             required
-            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 bg-transparent"
+            className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-green-500 bg-transparent"
+          />
+
+          <textarea
+            name="description"
+            placeholder="Description (ingredients, condition)"
+            value={form.description}
+            onChange={handleChange}
+            required
+            className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-green-500 bg-transparent"
           />
 
           <input
-            type="email"
-            name="email"
-            placeholder="Email address"
-            value={form.email}
+            type="number"
+            name="quantity"
+            placeholder="Quantity (people served)"
+            value={form.quantity}
             onChange={handleChange}
             required
-            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 bg-transparent"
+            className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-green-500 bg-transparent"
           />
 
           <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={form.password}
+            type="text"
+            name="pickupTime"
+            placeholder="Pickup time (e.g., 6-8 PM)"
+            value={form.pickupTime}
             onChange={handleChange}
             required
-            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 bg-transparent"
+            className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-green-500 bg-transparent"
           />
 
-          <select
-            name="role"
-            value={form.role}
+          <input
+            type="text"
+            name="location"
+            placeholder="Pickup location"
+            value={form.location}
             onChange={handleChange}
-            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 bg-transparent"
-          >
-            <option value="donor">Donor (Restaurant / Household)</option>
-            <option value="receiver">Receiver (NGO / Charity)</option>
-          </select>
+            required
+            className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-green-500 bg-transparent"
+          />
 
           <button
             type="submit"
@@ -121,21 +128,12 @@ export default function Register() {
             {loading ? (
               <Loader2 className="animate-spin" size={20} />
             ) : (
-              "Register"
+              "Post Donation"
             )}
           </button>
         </form>
-
-        <p className="text-sm text-center mt-6">
-          Already have an account?{" "}
-          <Link
-            to="/login"
-            className="text-green-600 dark:text-green-400 hover:underline font-medium"
-          >
-            Login
-          </Link>
-        </p>
       </div>
     </div>
   );
 }
+``
