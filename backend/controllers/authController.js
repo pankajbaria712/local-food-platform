@@ -20,17 +20,29 @@ export const registerUser = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
+    // Normalize role: allow frontend to send 'receiver' but store as 'ngo'
+    const normalizedRole = role === "receiver" ? "ngo" : role;
+
     // Save user
     const newUser = await User.create({
       name,
       email,
       password: hashedPassword,
-      role,
+      role: normalizedRole,
     });
 
-    res
-      .status(201)
-      .json({ message: "User registered successfully", user: newUser });
+    // Create JWT token on registration (same payload as login)
+    const token = jwt.sign(
+      { id: newUser._id, role: newUser.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    res.status(201).json({
+      message: "User registered successfully",
+      user: newUser,
+      token,
+    });
   } catch (error) {
     console.error("Error in registerUser:", error.message);
     res.status(500).json({ message: "Server error while registering user" });

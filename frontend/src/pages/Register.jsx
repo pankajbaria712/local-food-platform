@@ -110,7 +110,8 @@ export default function Register() {
             className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 bg-transparent"
           >
             <option value="donor">Donor (Restaurant / Household)</option>
-            <option value="receiver">Receiver (NGO / Charity)</option>
+            {/* send 'ngo' so it matches backend checks for user.role === 'ngo' */}
+            <option value="ngo">Receiver (NGO / Charity)</option>
           </select>
 
           <button
