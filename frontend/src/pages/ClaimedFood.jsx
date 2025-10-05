@@ -4,9 +4,13 @@ import { ThemeContext } from "../context/ThemeContext";
 import { Utensils, MapPin, Clock, Users } from "lucide-react";
 
 export default function ClaimedFood() {
-  const { theme } = useContext(ThemeContext);
+  const { theme, isDark } = useContext(ThemeContext);
   const [claimed, setClaimed] = useState([]);
-  const token = localStorage.getItem("token");
+  // sanitize token like BrowseFood
+  let token = localStorage.getItem("token");
+  if (!token || token === "undefined" || token === "null") token = null;
+  if (token && token.startsWith('"') && token.endsWith('"'))
+    token = token.slice(1, -1);
 
   useEffect(() => {
     const fetchClaimed = async () => {
@@ -25,9 +29,14 @@ export default function ClaimedFood() {
   const bgClass =
     theme === "dark"
       ? "bg-gray-950 text-gray-100"
+      : theme === "light"
+      ? "bg-gray-100 text-gray-900"
+      : isDark
+      ? "bg-gray-900 text-gray-100"
       : "bg-gray-100 text-gray-900";
+
   const cardClass =
-    theme === "dark"
+    theme === "dark" || (theme === "system" && isDark)
       ? "bg-gray-900 border-gray-800"
       : "bg-white border-gray-200";
 

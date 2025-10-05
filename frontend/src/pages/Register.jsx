@@ -30,7 +30,12 @@ export default function Register() {
         form
       );
       localStorage.setItem("user", JSON.stringify(res.data.user));
-      localStorage.setItem("token", res.data.token);
+      // Only store token if returned and valid
+      if (res.data?.token) {
+        localStorage.setItem("token", res.data.token);
+      } else {
+        localStorage.removeItem("token");
+      }
       navigate("/");
       window.location.reload();
     } catch (err) {

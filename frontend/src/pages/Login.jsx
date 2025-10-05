@@ -25,7 +25,11 @@ export default function Login() {
         form
       );
       localStorage.setItem("user", JSON.stringify(res.data.user));
-      localStorage.setItem("token", res.data.token);
+      if (res.data?.token) {
+        localStorage.setItem("token", res.data.token);
+      } else {
+        localStorage.removeItem("token");
+      }
       navigate("/");
       window.location.reload();
     } catch (err) {

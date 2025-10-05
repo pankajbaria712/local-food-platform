@@ -5,10 +5,16 @@ export const authMiddleware = async (req, res, next) => {
   // Check for 'Bearer <token>' format
   const token = req.headers.authorization?.split(" ")[1];
 
-  if (!token)
+  // Reject missing or obviously invalid token strings
+  if (
+    !token ||
+    token === "undefined" ||
+    token === "null" ||
+    token.trim() === ""
+  )
     return res
       .status(401)
-      .json({ message: "Access Denied: No token provided" });
+      .json({ message: "Access Denied: No token provided or token invalid" });
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -24,12 +30,10 @@ export const authMiddleware = async (req, res, next) => {
 
     // Check if user is verified (this is why you should add isVerified to User.js)
     if (!user.isVerified) {
-      return res
-        .status(401)
-        .json({
-          message:
-            "Account Not Verified: Please check your email to verify your account",
-        });
+      return res.status(401).json({
+        message:
+          "Account Not Verified: Please check your email to verify your account",
+      });
     }
 
     // Attach the user object (including role) to the request for controller access

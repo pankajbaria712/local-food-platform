@@ -15,8 +15,7 @@ import {
   HeartHandshake,
 } from "lucide-react";
 
-// Mock ThemeContext for standalone runnable code
-const ThemeContext = React.createContext({ theme: "light", isDark: false });
+import { ThemeContext } from "../context/ThemeContext";
 
 // Custom Modal Component to replace alert()
 const CustomModal = ({ show, message, type, onClose }) => {
@@ -83,7 +82,13 @@ export default function BrowseFood() {
   const [modalType, setModalType] = useState(""); // 'success' or 'error'
 
   // Get user info and token
-  const token = localStorage.getItem("token");
+  // Read token and sanitize common bad values (null, 'undefined', extra quotes)
+  let token = localStorage.getItem("token");
+  if (!token || token === "undefined" || token === "null") token = null;
+  // Trim potential surrounding quotes
+  if (token && token.startsWith('"') && token.endsWith('"')) {
+    token = token.slice(1, -1);
+  }
   const user = localStorage.getItem("user")
     ? JSON.parse(localStorage.getItem("user"))
     : null;
@@ -188,16 +193,20 @@ export default function BrowseFood() {
     setModalType("");
   };
 
-  // --- Theme-based style definitions, aligned with Login.jsx ---
+  // --- Theme-based style definitions (same logic as Login/Register) ---
   const bgClass =
     theme === "dark"
-      ? "bg-gray-950 text-gray-100" // Deeper dark background from Login.jsx
-      : "bg-gray-100 text-gray-900"; // Light background from Login.jsx
+      ? "bg-gray-950 text-gray-100"
+      : theme === "light"
+      ? "bg-gray-100 text-gray-900"
+      : isDark
+      ? "bg-gray-900 text-gray-100"
+      : "bg-gray-100 text-gray-900";
 
   const cardClass =
-    theme === "dark"
-      ? "bg-gray-900 border-gray-700 hover:shadow-green-500/50" // Dark card with slight contrast to background
-      : "bg-white border-gray-200 hover:shadow-green-300/50"; // White card
+    theme === "dark" || (theme === "system" && isDark)
+      ? "bg-gray-900 border-gray-800"
+      : "bg-white border-gray-200";
 
   const activeTabClass =
     "border-b-4 border-green-500 text-green-500 font-bold bg-green-500/10";

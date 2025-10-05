@@ -13,7 +13,11 @@ export default function Navbar() {
   // Load user/token once
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
-    const storedToken = localStorage.getItem("token");
+    let storedToken = localStorage.getItem("token");
+    if (!storedToken || storedToken === "undefined" || storedToken === "null")
+      storedToken = null;
+    if (storedToken && storedToken.startsWith('"') && storedToken.endsWith('"'))
+      storedToken = storedToken.slice(1, -1);
     setUser(storedUser ? JSON.parse(storedUser) : null);
     setToken(storedToken);
   }, []);
@@ -51,13 +55,14 @@ export default function Navbar() {
       ];
 
   // Theme icon
+  // Map to intuitive icons: Monitor=system, Sun=light, Moon=dark
   const themeIcon =
     theme === "system" ? (
       <Monitor size={18} />
     ) : theme === "dark" ? (
-      <Sun size={18} />
-    ) : (
       <Moon size={18} />
+    ) : (
+      <Sun size={18} />
     );
 
   // Helper: get navbar classes depending on theme & isDark
@@ -79,7 +84,7 @@ export default function Navbar() {
   const buttonBgClass = () => {
     if (theme === "light") return "bg-gray-200";
     if (theme === "dark") return "bg-gray-700";
-    return isDark ? "bg-black-700" : "bg-gray-200";
+    return isDark ? "bg-gray-800" : "bg-gray-200";
   };
 
   const handleLinkClick = (action) => {
