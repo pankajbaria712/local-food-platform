@@ -1,35 +1,36 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React from "react";
+import { Routes, Route } from "react-router-dom";
+import Navbar from "./components/Navbar";
+import "./index.css";
+
+// Example placeholder pages
+const Home = () => <h1 className="p-6">Welcome to FoodShare</h1>;
+const About = () => <h1 className="p-6">About Us</h1>;
+const Contact = () => <h1 className="p-6">Contact Page</h1>;
+const Login = () => <h1 className="p-6">Login Page</h1>;
+const Register = () => <h1 className="p-6">Register Page</h1>;
+const Donate = () => <h1 className="p-6">Donate Food Page</h1>;
+const MyPosts = () => <h1 className="p-6">My Posts</h1>;
+const Browse = () => <h1 className="p-6">Browse Food</h1>;
+const Claimed = () => <h1 className="p-6">Claimed Food</h1>;
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR Hello World !
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="bg-gray-50 dark:bg-gray-800 min-h-screen">
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/donate" element={<Donate />} />
+        <Route path="/myposts" element={<MyPosts />} />
+        <Route path="/browse" element={<Browse />} />
+        <Route path="/claimed" element={<Claimed />} />
+      </Routes>
+    </div>
+  );
 }
 
-export default App
+export default App;
