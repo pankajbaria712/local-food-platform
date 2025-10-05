@@ -32,7 +32,7 @@ export default function DonateFood() {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      navigate("/my-posts");
+      navigate("/myposts");
     } catch (err) {
       setError(err.response?.data?.message || "Something went wrong.");
     } finally {
@@ -136,4 +136,4 @@ export default function DonateFood() {
     </div>
   );
 }
-``
+``;

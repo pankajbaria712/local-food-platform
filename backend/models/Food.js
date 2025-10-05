@@ -12,8 +12,16 @@ const foodSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    claimedBy: {
+      // Tracks who claimed the food (null = unclaimed)
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
   },
-  { timestamps: true }
+  { timestamps: true } // Adds createdAt/updatedAt
 );
 
-export default mongoose.model("Food", foodSchema);
+const Food = mongoose.model("Food", foodSchema);
+
+export default Food;
