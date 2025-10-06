@@ -81,3 +81,43 @@ export const getClaimedFoods = async (req, res) => {
       .json({ message: "Server error while fetching claimed foods" });
   }
 };
+
+// Get all donations created by the currently authenticated donor
+export const getMyDonations = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const myFoods = await Food.find({ donorId: userId }).sort({
+      createdAt: -1,
+    });
+    res.json(myFoods);
+  } catch (error) {
+    console.error("Error in getMyDonations:", error.message);
+    res
+      .status(500)
+      .json({ message: "Server error while fetching your donations" });
+  }
+};
+
+// Delete a donation posted by the current user
+export const deleteDonation = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const foodId = req.params.id;
+
+    const food = await Food.findById(foodId);
+    if (!food) return res.status(404).json({ message: "Donation not found" });
+
+    // Only the donor who created the post can delete it
+    if (food.donorId.toString() !== userId) {
+      return res
+        .status(403)
+        .json({ message: "Not authorized to delete this donation" });
+    }
+
+    await food.remove();
+    res.json({ message: "Donation deleted successfully" });
+  } catch (error) {
+    console.error("Error in deleteDonation:", error.message);
+    res.status(500).json({ message: "Server error while deleting donation" });
+  }
+};
