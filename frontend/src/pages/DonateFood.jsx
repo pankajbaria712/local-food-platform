@@ -1,5 +1,6 @@
 import React, { useState, useContext } from "react";
 import axios from "axios";
+const API_BASE = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 import { useNavigate } from "react-router-dom";
 import { ThemeContext } from "../context/ThemeContext";
 import { Loader2 } from "lucide-react";
@@ -28,7 +29,7 @@ export default function DonateFood() {
     try {
       const token = localStorage.getItem("token");
 
-      await axios.post("http://localhost:5000/api/food/donate", form, {
+      await axios.post(`${API_BASE}/api/food/donate`, form, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

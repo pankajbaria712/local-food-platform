@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
+const API_BASE = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 import {
   Utensils,
   MapPin,
@@ -162,7 +163,7 @@ export default function MyPosts() {
     setLoading(true);
     setError(null);
     try {
-      const res = await axios.get("http://localhost:5000/api/food/my", {
+      const res = await axios.get(`${API_BASE}/api/food/my`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       // Normalize backend Food model fields to the frontend shape
@@ -217,7 +218,7 @@ export default function MyPosts() {
     setLoading(true); // Set loading while processing the deletion
     try {
       // Real API call to delete donation
-      await axios.delete(`http://localhost:5000/api/food/${donationId}`, {
+      await axios.delete(`${API_BASE}/api/food/${donationId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

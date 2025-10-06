@@ -1,5 +1,6 @@
 import React, { useState, useContext } from "react";
 import axios from "axios";
+const API_BASE = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 import { useNavigate, Link } from "react-router-dom";
 import { ThemeContext } from "../context/ThemeContext";
 import { Loader2 } from "lucide-react";
@@ -20,10 +21,7 @@ export default function Login() {
     setError("");
 
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/auth/login",
-        form
-      );
+      const res = await axios.post(`${API_BASE}/api/auth/login`, form);
       localStorage.setItem("user", JSON.stringify(res.data.user));
       if (res.data?.token) {
         localStorage.setItem("token", res.data.token);

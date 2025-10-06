@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
+const API_BASE = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 import { ThemeContext } from "../context/ThemeContext";
 import { Utensils, MapPin, Clock, Users } from "lucide-react";
 
@@ -15,7 +16,7 @@ export default function ClaimedFood() {
   useEffect(() => {
     const fetchClaimed = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/food/claimed", {
+        const res = await axios.get(`${API_BASE}/api/food/claimed`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setClaimed(res.data);

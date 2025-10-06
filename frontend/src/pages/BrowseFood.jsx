@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
+const API_BASE = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 import {
   Utensils,
   MapPin,
@@ -111,12 +112,12 @@ export default function BrowseFood() {
 
     try {
       let res;
-      let url = "http://localhost:5000/api/food";
+      let url = `${API_BASE}/api/food`;
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
 
       if (mode === "claimed") {
         // Endpoint for NGO's claimed food
-        url = "http://localhost:5000/api/food/claimed";
+        url = `${API_BASE}/api/food/claimed`;
         res = await axios.get(url, { headers });
         setFoods(res.data);
       } else {
@@ -164,7 +165,7 @@ export default function BrowseFood() {
     try {
       // API endpoint: POST /api/food/claim/:id
       await axios.post(
-        `http://localhost:5000/api/food/claim/${id}`,
+        `${API_BASE}/api/food/claim/${id}`,
         {},
         {
           headers: { Authorization: `Bearer ${token}` },
