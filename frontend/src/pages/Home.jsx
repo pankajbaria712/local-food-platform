@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useContext } from "react";
+import { ThemeContext } from "../context/ThemeContext"; // Assuming the context path
 
 // Placeholder utility for icons (as we cannot use external libraries like lucide-react)
 const Icon = ({ path, className = "w-6 h-6" }) => (
@@ -16,47 +17,22 @@ const Icon = ({ path, className = "w-6 h-6" }) => (
 
 // --- Component Definitions (Internal to the single file) ---
 
-const Header = () => (
-  <header className="py-4 px-4 sm:px-6 lg:px-8 bg-white/90 backdrop-blur-sm sticky top-0 z-10 shadow-sm">
-    <div className="max-w-7xl mx-auto flex justify-between items-center">
-      <div className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-600 to-lime-500">
-        FoodShare
-      </div>
-      <nav className="hidden md:flex space-x-6">
-        {["Features", "Impact", "How It Works", "Pricing"].map((item) => (
-          <a
-            key={item}
-            href={`#${item.toLowerCase().replace(/ /g, "-")}`}
-            className="text-gray-600 hover:text-green-600 font-medium transition duration-150"
-          >
-            {item}
-          </a>
-        ))}
-      </nav>
-      <a
-        href="/signup"
-        className="px-4 py-2 bg-green-600 text-white rounded-lg shadow-md hover:bg-green-700 transition duration-150"
-      >
-        Get Started
-      </a>
-    </div>
-  </header>
-);
+// Removed the Header component as requested
 
-const HeroSection = () => (
-  <section className="pt-20 pb-28 bg-gray-50/50" id="hero">
+const HeroSection = ({ textClass, cardClass }) => (
+  <section className="pt-20 pb-28 bg-transparent" id="hero">
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="grid md:grid-cols-2 gap-12 items-center">
         {/* Left Side: Headline and CTA */}
         <div>
           <h1 className="text-5xl md:text-6xl font-extrabold leading-tight mb-6 tracking-tight">
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-green-600 to-lime-500">
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-green-500 to-lime-400">
               Share Surplus Food.
             </span>
             <br />
-            <span className="text-gray-900">Nourish Your Community.</span>
+            <span className={textClass}>Nourish Your Community.</span>
           </h1>
-          <p className="text-xl text-gray-600 mb-8 max-w-lg">
+          <p className="text-xl text-gray-500 mb-8 max-w-lg">
             FoodShare makes it simple for businesses and homes to donate surplus
             meals to local charities and NGOs, fighting hunger and reducing
             waste effortlessly.
@@ -71,50 +47,59 @@ const HeroSection = () => (
             </a>
             <a
               href="/browse"
-              className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold border-2 border-green-200 text-green-700 bg-white rounded-xl hover:bg-green-50 transition duration-300"
+              className={`inline-flex items-center justify-center px-8 py-4 text-lg font-semibold border-2 border-green-200 text-green-700 ${cardClass} rounded-xl hover:bg-green-50 transition duration-300 dark:border-green-700 dark:text-green-400 dark:hover:bg-green-900`}
             >
               Browse Listings
             </a>
           </div>
         </div>
 
-        {/* Right Side: Feature Cards (Original content, enhanced style) */}
-        <div className="space-y-6 md:space-y-8 p-6 md:p-10 bg-white shadow-2xl rounded-3xl border border-gray-100">
-          <div className="p-5 rounded-2xl bg-lime-50 border-l-4 border-lime-500">
-            <h4 className="font-bold text-lg text-gray-800 flex items-center mb-1">
+        {/* Right Side: Feature Cards */}
+        <div
+          className={`space-y-6 md:space-y-8 p-6 md:p-10 shadow-2xl rounded-3xl border ${cardClass} transition-all duration-500`}
+        >
+          {/* Using textClass for card titles to ensure dark mode visibility */}
+          <div className="p-5 rounded-2xl bg-lime-50/20 border-l-4 border-lime-500 dark:bg-lime-900/30">
+            <h4
+              className={`font-bold text-lg ${textClass} flex items-center mb-1`}
+            >
               <Icon
                 path="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                 className="w-5 h-5 mr-3 text-lime-500"
               />
               Instant Posting for Donors
             </h4>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
               Quickly post surplus food with pickup details and quantity. Take a
               photo, set a time, and help reduce waste in minutes.
             </p>
           </div>
-          <div className="p-5 rounded-2xl bg-green-50 border-l-4 border-green-500">
-            <h4 className="font-bold text-lg text-gray-800 flex items-center mb-1">
+          <div className="p-5 rounded-2xl bg-green-50/20 border-l-4 border-green-500 dark:bg-green-900/30">
+            <h4
+              className={`font-bold text-lg ${textClass} flex items-center mb-1`}
+            >
               <Icon
                 path="M13 10V3L4 14h7v7l9-11h-7z"
                 className="w-5 h-5 mr-3 text-green-500"
               />
               Direct Claiming for NGOs
             </h4>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
               Claim essential food donations and coordinate pickups directly
               with donors in your specific service area.
             </p>
           </div>
-          <div className="p-5 rounded-2xl bg-blue-50 border-l-4 border-blue-500">
-            <h4 className="font-bold text-lg text-gray-800 flex items-center mb-1">
+          <div className="p-5 rounded-2xl bg-blue-50/20 border-l-4 border-blue-500 dark:bg-blue-900/30">
+            <h4
+              className={`font-bold text-lg ${textClass} flex items-center mb-1`}
+            >
               <Icon
                 path="M9 12l2 2 4-4m5.617 7.083a9 9 0 11-12.63-12.63l12.63 12.63z"
                 className="w-5 h-5 mr-3 text-blue-500"
               />
               Secure & Auditable
             </h4>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
               All transactions are logged, ensuring transparency, safety, and
               compliance for all partners.
             </p>
@@ -125,10 +110,10 @@ const HeroSection = () => (
   </section>
 );
 
-const HowItWorksSection = () => (
-  <section className="py-20 bg-white" id="how-it-works">
+const HowItWorksSection = ({ textClass, cardClass }) => (
+  <section className="py-20 bg-transparent" id="how-it-works">
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-      <h2 className="text-4xl font-bold mb-4 text-gray-900">
+      <h2 className={`text-4xl font-bold mb-4 ${textClass}`}>
         Simple Steps to Share
       </h2>
       <p className="text-xl text-gray-500 mb-16">
@@ -163,7 +148,7 @@ const HowItWorksSection = () => (
         ].map((step, index) => (
           <div
             key={index}
-            className="p-8 rounded-2xl bg-white shadow-xl hover:shadow-2xl transition duration-300 transform hover:-translate-y-1 border border-gray-100"
+            className={`p-8 rounded-2xl shadow-xl hover:shadow-2xl transition duration-300 transform hover:-translate-y-1 border ${cardClass}`}
           >
             <div
               className="flex items-center justify-center w-14 h-14 mx-auto rounded-full mb-6"
@@ -185,10 +170,12 @@ const HowItWorksSection = () => (
             >
               <Icon path={step.iconPath} className="w-8 h-8 text-white" />
             </div>
-            <h3 className="text-2xl font-bold mb-3 text-gray-900">
+            <h3 className={`text-2xl font-bold mb-3 ${textClass}`}>
               {step.title}
             </h3>
-            <p className="text-gray-500">{step.description}</p>
+            <p className="text-gray-500 dark:text-gray-400">
+              {step.description}
+            </p>
           </div>
         ))}
       </div>
@@ -197,7 +184,8 @@ const HowItWorksSection = () => (
 );
 
 const ImpactSection = () => (
-  <section className="py-24 bg-green-700" id="impact">
+  // This section keeps its distinct dark background for visual contrast
+  <section className="py-24 bg-green-700 dark:bg-green-900" id="impact">
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
       <h2 className="text-4xl font-bold mb-16 text-white">
         Our Real-World Impact
@@ -226,12 +214,12 @@ const ImpactSection = () => (
         ].map((item, index) => (
           <div
             key={index}
-            className="p-8 rounded-2xl bg-white bg-opacity-10 backdrop-blur-sm border-2 border-white/20"
+            className="p-8 rounded-2xl bg-white/10 backdrop-blur-sm border-2 border-white/20 transition hover:bg-white/20"
           >
             <div
-              className={`flex items-center justify-center w-16 h-16 mx-auto mb-4 rounded-full bg-${item.color}`}
+              className={`flex items-center justify-center w-16 h-16 mx-auto mb-4 rounded-full bg-white/30`}
             >
-              <Icon path={item.iconPath} className="w-8 h-8 text-green-900" />
+              <Icon path={item.iconPath} className="w-8 h-8 text-white" />
             </div>
             <p className="text-5xl font-extrabold text-white mb-2">
               {item.stat}
@@ -244,10 +232,10 @@ const ImpactSection = () => (
   </section>
 );
 
-const TrustSection = () => (
-  <section className="py-20 bg-gray-50" id="features">
+const TrustSection = ({ textClass, cardClass }) => (
+  <section className="py-20 bg-transparent" id="features">
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-      <h2 className="text-3xl font-bold mb-10 text-gray-900">
+      <h2 className={`text-3xl font-bold mb-10 ${textClass}`}>
         Built for Reliability & Trust
       </h2>
       <p className="text-xl text-gray-500 mb-12 max-w-2xl mx-auto">
@@ -287,16 +275,18 @@ const TrustSection = () => (
         ].map((feature, index) => (
           <div
             key={index}
-            className="p-6 rounded-xl bg-white border border-gray-200 transition hover:border-green-500"
+            className={`p-6 rounded-xl border transition hover:border-green-500 ${cardClass}`}
           >
             <Icon
               path={feature.iconPath}
-              className="w-8 h-8 text-green-600 mb-3 mx-auto"
+              className="w-8 h-8 text-green-500 mb-3 mx-auto"
             />
-            <h4 className="font-semibold text-xl mb-2 text-gray-900">
+            <h4 className={`font-semibold text-xl mb-2 ${textClass}`}>
               {feature.title}
             </h4>
-            <p className="text-sm text-gray-500">{feature.description}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              {feature.description}
+            </p>
           </div>
         ))}
       </div>
@@ -305,7 +295,8 @@ const TrustSection = () => (
 );
 
 const CTASection = () => (
-  <section className="py-20 bg-gray-900">
+  // This section keeps its distinct dark background for visual contrast
+  <section className="py-20 bg-gray-900 dark:bg-black">
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
       <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-6">
         Ready to make a difference?
@@ -326,19 +317,21 @@ const CTASection = () => (
   </section>
 );
 
-const Footer = () => (
-  <footer className="bg-gray-800 py-10">
+const Footer = ({ cardClass }) => (
+  <footer className="bg-gray-800 dark:bg-gray-950 py-10 border-t border-gray-700">
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-gray-400 text-sm">
       <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-        <div className="text-lg font-bold text-green-400">FoodShare</div>
+        <div className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-lime-300">
+          FoodShare
+        </div>
         <nav className="flex space-x-6">
-          <a href="#" className="hover:text-white">
+          <a href="#" className="hover:text-white transition">
             Privacy Policy
           </a>
-          <a href="#" className="hover:text-white">
+          <a href="#" className="hover:text-white transition">
             Terms of Service
           </a>
-          <a href="#" className="hover:text-white">
+          <a href="#" className="hover:text-white transition">
             Contact
           </a>
         </nav>
@@ -351,18 +344,40 @@ const Footer = () => (
 );
 
 export default function Home() {
+  const { theme, isDark } = useContext(ThemeContext);
+
+  // Apply theme logic from Login.jsx
+  const bgClass =
+    theme === "dark"
+      ? "bg-gray-950"
+      : theme === "light"
+      ? "bg-gray-100"
+      : isDark
+      ? "bg-gray-900"
+      : "bg-gray-100";
+
+  const textClass =
+    theme === "dark" || (theme === "system" && isDark)
+      ? "text-gray-100"
+      : "text-gray-900";
+
+  const cardClass =
+    theme === "dark" || (theme === "system" && isDark)
+      ? "bg-gray-900 border-gray-800"
+      : "bg-white border-gray-200";
+
   return (
-    <div className="min-h-screen font-sans bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
-      {/* Container for the whole page, ensuring smooth scrolling and applying primary font */}
-      <Header />
+    <div
+      className={`min-h-screen font-sans ${bgClass} ${textClass} transition-colors duration-500`}
+    >
       <main>
-        <HeroSection />
-        <HowItWorksSection />
+        <HeroSection textClass={textClass} cardClass={cardClass} />
+        <HowItWorksSection textClass={textClass} cardClass={cardClass} />
         <ImpactSection />
-        <TrustSection />
+        <TrustSection textClass={textClass} cardClass={cardClass} />
         <CTASection />
       </main>
-      <Footer />
+      <Footer cardClass={cardClass} />
     </div>
   );
 }
